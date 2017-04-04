@@ -125,6 +125,24 @@ dist: vendor-ansible/out vendor-provision/out vendor-kuberang/$(KUBERANG_VERSION
 	tar -czf kismatic.tar.gz -C out .
 	mv kismatic.tar.gz out
 
+docker: GOOS=linux
+docker: vendor-ansible/out vendor-provision/out vendor-kuberang/$(KUBERANG_VERSION) build-inspector
+	@$(MAKE) GOOS=linux bin/linux/kismatic
+	mkdir -p out-docker
+	cp bin/linux/kismatic out-docker
+	mkdir -p out-docker/ansible
+	cp -r vendor-ansible/out/* out-docker/ansible
+	rm -rf out-docker/ansible/playbooks
+	cp -r ansible out-docker/ansible/playbooks
+	mkdir -p out-docker/ansible/playbooks/inspector
+	cp -r bin/inspector/* out-docker/ansible/playbooks/inspector
+	mkdir -p out-docker/ansible/playbooks/kuberang/linux/amd64/
+	cp vendor-kuberang/$(KUBERANG_VERSION)/kuberang-linux-amd64 out-docker/ansible/playbooks/kuberang/linux/amd64/kuberang
+	cp docker/Dockerfile.kismatic out-docker/Dockerfile.kismatic
+	docker build -f out-docker/Dockerfile.kismatic -t apprenda/kismatic:latest --build-arg ANSIBLE_VERSION=$(ANSIBLE_VERSION) out-docker
+	docker tag apprenda/kismatic:latest apprenda/kismatic:$(VERSION)
+	rm -rf out-docker
+
 integration/vendor: tools/glide
 	go get github.com/onsi/ginkgo/ginkgo
 	cd integration && ../tools/glide install
