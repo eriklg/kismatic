@@ -389,7 +389,7 @@ func (dlvm DockerStorageDirectLVM) validate() (bool, []error) {
 		if dlvm.BlockDevice == "" {
 			v.addError(errors.New("DirectLVM is enabled, but no block device was specified"))
 		}
-		if dlvm.BlockDevice != "" && dlvm.BlockDevice[0] != '/' {
+		if !filepath.IsAbs(dlvm.BlockDevice) {
 			v.addError(errors.New("Path to the block device must be absolute"))
 		}
 	}
