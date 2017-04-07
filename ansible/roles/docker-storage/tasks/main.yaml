@@ -1,0 +1,41 @@
+---
+  - name: Stat the block device path
+    stat:
+      path: "{{ docker_direct_lvm_block_device_path }}"
+    register: block_device_stat
+  - name: Verify that the block device exists 
+    fail:
+      msg: "Block device specified for docker storage does not exist."
+    when: block_device_stat.stat.exists == False
+  - name: Verify that the provided path is a block device
+    fail:
+      msg: "{{ docker_direct_lvm_block_device_path }} is not a block device."
+    when: block_device_stat.stat.isblk == False
+  - name: Verify that the block device is not mounted
+    fail:
+      msg: "Block deviced specified for docker storage is currently mounted. This should be an unmounted, unused device"
+    with_items: ansible_mounts
+    when: item.device == "{{ docker_direct_lvm_block_device_path }}"
+  - name: Install lvm2 package
+    package:
+      name: lvm2
+      state: present
+  # Not using lvol and lvg ansible modules here as they are in preview
+  - name: Create a physical volume on the block device
+    command: pvcreate {{ docker_direct_lvm_block_device_path }}
+  - name: Create docker volume group
+    command: vgcreate docker {{ docker_direct_lvm_block_device_path }}
+  - name: Create thinpool logical volume
+    command: lvcreate --wipesignatures y -n thinpool docker -l 95%VG
+  - name: Create thinpoolmeta logical volume
+    command: lvcreate --wipesignatures y -n thinpoolmeta docker -l 1%VG
+  - name: Convert the pool to a thin pool
+    command: lvconvert -y --zero n -c 512K --thinpool docker/thinpool --poolmetadata docker/thinpoolmeta
+  - name: Create auto extension profile
+    template:
+      src: docker-thinpool.profile
+      dest: /etc/lvm/profile/docker-thinpool.profile
+  - name: Apply lvm profile
+    command: lvchange --metadataprofile docker-thinpool docker/thinpool
+  - name: Enable monitoring to ensure autoextend executes
+    command: lvchange --metadataprofile docker-thinpool docker/thinpool
