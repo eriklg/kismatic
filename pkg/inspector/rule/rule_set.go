@@ -243,10 +243,6 @@ const defaultRuleSet = `---
   packageName: docker-engine
   packageVersion: 1.11.2-1.el7.centos
 - kind: PackageDependency
-  when: ["master","centos"]
-  packageName: lvm2
-  anyVersion: true
-- kind: PackageDependency
   when: ["master","centos", "disconnected"]
   packageName: kismatic-offline
   packageVersion: 1.6.0_1-1
@@ -255,25 +251,13 @@ const defaultRuleSet = `---
   packageName: docker-engine
   packageVersion: 1.11.2-1.el7.centos
 - kind: PackageDependency
-  when: ["worker","centos"]
-  packageName: lvm2
-  anyVersion: true
-- kind: PackageDependency
   when: ["ingress","centos"]
   packageName: docker-engine
   packageVersion: 1.11.2-1.el7.centos
 - kind: PackageDependency
-  when: ["ingress","centos"]
-  packageName: lvm2
-  anyVersion: true
-- kind: PackageDependency
   when: ["storage","centos"]
   packageName: docker-engine
   packageVersion: 1.11.2-1.el7.centos
-- kind: PackageDependency
-  when: ["storage","centos"]
-  packageName: lvm2
-  anyVersion: true
 - kind: PackageDependency
   when: ["worker","centos"]
   packageName: kubelet
@@ -304,10 +288,6 @@ const defaultRuleSet = `---
   packageName: docker-engine
   packageVersion: 1.11.2-1.el7.centos
 - kind: PackageDependency
-  when: ["master", "rhel"]
-  packageName: lvm2
-  anyVersion: true
-- kind: PackageDependency
   when: ["master","rhel", "disconnected"]
   packageName: kismatic-offline
   packageVersion: 1.6.0_1-1
@@ -316,25 +296,13 @@ const defaultRuleSet = `---
   packageName: docker-engine
   packageVersion: 1.11.2-1.el7.centos
 - kind: PackageDependency
-  when: ["worker", "rhel"]
-  packageName: lvm2
-  anyVersion: true
-- kind: PackageDependency
   when: ["ingress","centos"]
   packageName: docker-engine
   packageVersion: 1.11.2-1.el7.centos
 - kind: PackageDependency
-  when: ["ingress", "rhel"]
-  packageName: lvm2
-  anyVersion: true
-- kind: PackageDependency
   when: ["storage","centos"]
   packageName: docker-engine
   packageVersion: 1.11.2-1.el7.centos
-- kind: PackageDependency
-  when: ["storage", "rhel"]
-  packageName: lvm2
-  anyVersion: true
 - kind: PackageDependency
   when: ["worker","rhel"]
   packageName: kubelet
